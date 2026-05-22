@@ -207,6 +207,9 @@ const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime(
 
 export default defineConfig({
   plugins,
+  // For GitHub Pages: set base to '/<repo-name>/' via env var or default to '/'
+  // When deploying to github.com/user/mindful-noting, set VITE_BASE_PATH=/mindful-noting/
+  base: process.env.VITE_BASE_PATH || "/",
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "client", "src"),

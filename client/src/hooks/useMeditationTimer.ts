@@ -3,7 +3,8 @@ import {
   Waypoint,
   getWaypointsForDuration,
   calculateWaypointSchedule,
-  BINAURAL_MUSIC_URL,
+  getAudioUrl,
+  BINAURAL_MUSIC_FILE,
 } from "@/lib/meditation-data";
 
 export type MeditationState = "idle" | "countdown" | "active" | "paused" | "complete";
@@ -53,16 +54,15 @@ export function useMeditationTimer(): MeditationTimerReturn {
       musicRef.current.pause();
       musicRef.current = null;
     }
-    const music = new Audio(BINAURAL_MUSIC_URL);
+    const music = new Audio(getAudioUrl(BINAURAL_MUSIC_FILE));
     music.loop = true;
-    music.volume = 0.35; // Keep it subtle behind the voice
+    music.volume = 0.35;
     music.play().catch(() => {});
     musicRef.current = music;
   }, []);
 
   const stopMusic = useCallback(() => {
     if (musicRef.current) {
-      // Fade out over 2 seconds
       const music = musicRef.current;
       const fadeInterval = setInterval(() => {
         if (music.volume > 0.02) {
@@ -86,7 +86,7 @@ export function useMeditationTimer(): MeditationTimerReturn {
     if (musicRef.current) {
       musicRef.current.volume = 0.15;
     }
-    const audio = new Audio(waypoint.audioUrl);
+    const audio = new Audio(getAudioUrl(waypoint.audioFile));
     audio.volume = 1.0;
     audio.onended = () => {
       // Restore music volume after voice finishes
@@ -97,7 +97,6 @@ export function useMeditationTimer(): MeditationTimerReturn {
     audio.play().catch(() => {});
     audioRef.current = audio;
     setCurrentWaypoint(waypoint);
-    setCurrentWaypointIndex((prev) => prev); // don't trigger re-render here
   }, []);
 
   const startSession = useCallback((durationMinutes: number) => {
@@ -126,7 +125,6 @@ export function useMeditationTimer(): MeditationTimerReturn {
           clearInterval(countdownIntervalRef.current);
           countdownIntervalRef.current = null;
         }
-        // Start the actual meditation
         setState("active");
         startTimeRef.current = Date.now();
 
@@ -146,7 +144,6 @@ export function useMeditationTimer(): MeditationTimerReturn {
           const elapsed = pausedElapsedRef.current + (now - startTimeRef.current) / 1000;
           setElapsedSeconds(elapsed);
 
-          // Check if session is complete
           if (elapsed >= totalSec) {
             clearTimer();
             setState("complete");
@@ -157,7 +154,6 @@ export function useMeditationTimer(): MeditationTimerReturn {
             return;
           }
 
-          // Check if next waypoint should play
           const nextIdx = nextWaypointIndexRef.current;
           if (nextIdx < schedule.length && elapsed >= schedule[nextIdx]) {
             playWaypointAudio(sessionWaypoints[nextIdx]);

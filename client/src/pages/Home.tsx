@@ -7,12 +7,19 @@
  * - Cormorant Garamond display + Karla body typography
  * - Asymmetric layout, generous negative space
  * - Deliberately slow animations (600-800ms transitions)
+ * 
+ * Images use CDN URLs that work on any hosting platform including GitHub Pages.
  */
 
 import { DurationSelector } from "@/components/DurationSelector";
 import { MeditationView } from "@/components/MeditationView";
 import { CompletionView } from "@/components/CompletionView";
 import { useMeditationTimer } from "@/hooks/useMeditationTimer";
+
+// CDN-hosted images (work on any platform)
+const PAPER_TEXTURE = "https://d2xsxph8kpxj0f.cloudfront.net/310519663324464762/PWar4ukwNMcBM6qdEajYxi/paper-texture-8vtF6xfrVUBq4MemS6MXXC.webp";
+const INK_WASH_MOUNTAIN = "https://d2xsxph8kpxj0f.cloudfront.net/310519663324464762/PWar4ukwNMcBM6qdEajYxi/ink-wash-mountain-jxCcjtSr49rav9vaGfUeuj.webp";
+const ENSO_CIRCLE = "https://d2xsxph8kpxj0f.cloudfront.net/310519663324464762/PWar4ukwNMcBM6qdEajYxi/enso-transparent-jVJB85U9G2Qh9G8fUFxRfr.png";
 
 export default function Home() {
   const timer = useMeditationTimer();
@@ -21,7 +28,7 @@ export default function Home() {
     <div
       className="min-h-screen relative overflow-hidden"
       style={{
-        backgroundImage: `url('https://d2xsxph8kpxj0f.cloudfront.net/310519663324464762/PWar4ukwNMcBM6qdEajYxi/paper-texture-8vtF6xfrVUBq4MemS6MXXC.webp')`,
+        backgroundImage: `url('${PAPER_TEXTURE}')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}
@@ -31,7 +38,7 @@ export default function Home() {
         <div
           className="absolute inset-0 opacity-25 pointer-events-none"
           style={{
-            backgroundImage: `url('https://d2xsxph8kpxj0f.cloudfront.net/310519663324464762/PWar4ukwNMcBM6qdEajYxi/ink-wash-mountain-jxCcjtSr49rav9vaGfUeuj.webp')`,
+            backgroundImage: `url('${INK_WASH_MOUNTAIN}')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center bottom',
           }}
@@ -47,7 +54,7 @@ export default function Home() {
               {/* Enso circle image */}
               <div className="mb-6 flex justify-center">
                 <img
-                  src="https://d2xsxph8kpxj0f.cloudfront.net/310519663324464762/PWar4ukwNMcBM6qdEajYxi/enso-transparent-jVJB85U9G2Qh9G8fUFxRfr.png"
+                  src={ENSO_CIRCLE}
                   alt="Enso circle"
                   className="w-28 h-28 md:w-36 md:h-36 object-contain opacity-60"
                 />

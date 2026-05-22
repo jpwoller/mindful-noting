@@ -3,6 +3,9 @@
  * Based on the guided meditation from "One Breath at a Time."
  * 
  * Design: Wabi-Sabi Minimalism — ink wash, rice paper, organic forms
+ * 
+ * Audio paths use relative URLs from public/audio/ for GitHub Pages compatibility.
+ * All audio is MP3 format for broad browser support and smaller file sizes.
  */
 
 export interface Waypoint {
@@ -13,82 +16,85 @@ export interface Waypoint {
   audioDuration: number; // seconds
 }
 
+/** Background binaural meditation music URL (loops during session) */
+export const BINAURAL_MUSIC_URL = "/audio/binaural-loop.mp3";
+
 export const waypoints: Waypoint[] = [
   {
     id: 0,
-    title: "Welcome",
-    text: "Find a comfortable position. Close your eyes if you'd like. Take a moment to arrive here, letting go of whatever came before.",
-    audioUrl: "/manus-storage/waypoint_00_intro_26d99407.wav",
-    audioDuration: 13.8,
+    title: "The Five Hindrances",
+    text: "In this practice, we work with the Five Hindrances — desire, aversion, sleepiness, restlessness, and doubt. These are not personal failings. They are shared by all people. Our task is to notice when they arise, name them gently, and return to the breath.",
+    audioUrl: "/audio/waypoint_00_hindrances_intro.mp3",
+    audioDuration: 42.0,
   },
   {
     id: 1,
     title: "Settling",
     text: "Begin by relaxing with the breath, settling into the body. With each breath, make a soft mental note: in-breath, out-breath.",
-    audioUrl: "/manus-storage/waypoint_01_opening_9345a143.wav",
+    audioUrl: "/audio/waypoint_01_opening.mp3",
     audioDuration: 15.5,
   },
   {
     id: 2,
     title: "Anchoring",
     text: "Feel the sensations of breath at the nostrils or the belly. Don't try to control the breath. Just breathe, and know you are breathing.",
-    audioUrl: "/manus-storage/waypoint_02_anchoring_8696d980.wav",
+    audioUrl: "/audio/waypoint_02_anchoring.mp3",
     audioDuration: 13.8,
   },
   {
     id: 3,
     title: "Noting Thoughts",
     text: "When the mind wanders, make a mental note: thinking, thinking. And gently return to the breath.",
-    audioUrl: "/manus-storage/waypoint_03_noting_thoughts_6206a2a5.wav",
+    audioUrl: "/audio/waypoint_03_noting_thoughts.mp3",
     audioDuration: 23.0,
   },
   {
     id: 4,
     title: "Refining",
     text: "Try to refine your attention: is it a thought of wanting, or not-wanting? Note wanting, or aversion. Then return to the breath.",
-    audioUrl: "/manus-storage/waypoint_04_refining_c3efcead.wav",
+    audioUrl: "/audio/waypoint_04_refining.mp3",
     audioDuration: 16.7,
   },
   {
     id: 5,
     title: "Judgments",
     text: "The moment of noticing a thought is actually a moment to enjoy. Enjoy the relief of coming back to wakefulness.",
-    audioUrl: "/manus-storage/waypoint_05_judgments_6d1d01f3.wav",
+    audioUrl: "/audio/waypoint_05_judgments.mp3",
     audioDuration: 17.1,
   },
   {
     id: 6,
     title: "Sensations",
     text: "As you let go and return to the breath, soften the belly, relax the shoulders, breathe into the tension and let go.",
-    audioUrl: "/manus-storage/waypoint_06_sensations_b6443ad9.wav",
+    audioUrl: "/audio/waypoint_06_sensations.mp3",
     audioDuration: 24.95,
   },
   {
     id: 7,
     title: "Hindrances",
     text: "Notice sleepiness, restlessness, doubt. If they appear, experience them with mindfulness. Note them, then let go.",
-    audioUrl: "/manus-storage/waypoint_07_hindrances_6fab8317.wav",
+    audioUrl: "/audio/waypoint_07_hindrances.mp3",
     audioDuration: 12.85,
   },
   {
     id: 8,
     title: "Moods",
     text: "Notice moods. Are you sad, angry, bored, anxious? Happy, loving, calm? Note these feelings as well.",
-    audioUrl: "/manus-storage/waypoint_08_moods_4e3af5bf.wav",
+    audioUrl: "/audio/waypoint_08_moods.mp3",
     audioDuration: 13.95,
   },
   {
     id: 9,
     title: "Letting Go",
     text: "A thought is a thought. Just let go.",
-    audioUrl: "/manus-storage/waypoint_09_letting_go_314740f2.wav",
+    audioUrl: "/audio/waypoint_09_letting_go.mp3",
     audioDuration: 11.9,
   },
   {
     id: 10,
     title: "Closing",
     text: "Gently bring your awareness back to the room. When you're ready, slowly open your eyes.",
-    audioUrl: "/manus-storage/waypoint_10_closing_2820da64.wav",
+    audioUrl: "/audio/waypoint_10_closing.mp3",
     audioDuration: 9.7,
   },
 ];
@@ -96,6 +102,7 @@ export const waypoints: Waypoint[] = [
 /**
  * Get the waypoints to use for a given session duration.
  * Shorter sessions use fewer waypoints; longer sessions use all of them.
+ * The Five Hindrances intro (id:0) is always included as the first waypoint.
  */
 export function getWaypointsForDuration(durationMinutes: number): Waypoint[] {
   if (durationMinutes <= 3) {

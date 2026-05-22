@@ -10,6 +10,8 @@ import { MeditationView } from "@/components/MeditationView";
 import { CompletionView } from "@/components/CompletionView";
 import { useMeditationTimer } from "@/hooks/useMeditationTimer";
 
+const PAPER_TEXTURE = "https://d2xsxph8kpxj0f.cloudfront.net/310519663324464762/PWar4ukwNMcBM6qdEajYxi/paper-texture-8vtF6xfrVUBq4MemS6MXXC.webp";
+
 export default function MeditationSession() {
   const [, setLocation] = useLocation();
   const timer = useMeditationTimer();
@@ -35,7 +37,7 @@ export default function MeditationSession() {
     <div
       className="min-h-screen relative"
       style={{
-        backgroundImage: `url('https://d2xsxph8kpxj0f.cloudfront.net/310519663324464762/PWar4ukwNMcBM6qdEajYxi/paper-texture-8vtF6xfrVUBq4MemS6MXXC.webp')`,
+        backgroundImage: `url('${PAPER_TEXTURE}')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}

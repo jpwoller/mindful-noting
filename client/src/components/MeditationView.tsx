@@ -2,9 +2,13 @@
  * Meditation View Component
  * Shows during active meditation: timer circle, current instruction, controls
  * Wabi-Sabi: organic timer, slow fades, generous space
+ * 
+ * BUG FIX: Text flashing was caused by using Date.now() as React key,
+ * which forced a remount on every render cycle. Now uses a stable
+ * waypointRevision counter that only increments when a NEW waypoint arrives.
  */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { MeditationState } from "@/hooks/useMeditationTimer";
 import { Waypoint } from "@/lib/meditation-data";
 import { Pause, Play, X } from "lucide-react";
@@ -40,22 +44,39 @@ export function MeditationView({
   onResume,
   onStop,
 }: MeditationViewProps) {
-  const [showWaypoint, setShowWaypoint] = useState(false);
-  const [displayedWaypoint, setDisplayedWaypoint] = useState<Waypoint | null>(null);
+  const [visible, setVisible] = useState(false);
+  const [displayedText, setDisplayedText] = useState("");
+  const [waypointKey, setWaypointKey] = useState(0);
+  const hideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const prevWaypointRef = useRef<Waypoint | null>(null);
 
-  // Animate waypoint text in/out
+  // Only update text when a genuinely new waypoint arrives
   useEffect(() => {
-    if (currentWaypoint) {
-      setDisplayedWaypoint(currentWaypoint);
-      setShowWaypoint(true);
+    if (currentWaypoint && currentWaypoint !== prevWaypointRef.current) {
+      prevWaypointRef.current = currentWaypoint;
 
-      // Hide after audio duration + 3 seconds
-      const hideTimeout = setTimeout(() => {
-        setShowWaypoint(false);
-      }, (currentWaypoint.audioDuration + 3) * 1000);
+      // Clear any pending hide timeout
+      if (hideTimeoutRef.current) {
+        clearTimeout(hideTimeoutRef.current);
+        hideTimeoutRef.current = null;
+      }
 
-      return () => clearTimeout(hideTimeout);
+      // Set the new text and make visible
+      setDisplayedText(currentWaypoint.text);
+      setWaypointKey((k) => k + 1);
+      setVisible(true);
+
+      // Hide after audio duration + 4 seconds
+      hideTimeoutRef.current = setTimeout(() => {
+        setVisible(false);
+      }, (currentWaypoint.audioDuration + 4) * 1000);
     }
+
+    return () => {
+      if (hideTimeoutRef.current) {
+        clearTimeout(hideTimeoutRef.current);
+      }
+    };
   }, [currentWaypoint]);
 
   // Countdown view
@@ -140,11 +161,11 @@ export function MeditationView({
         </div>
       </div>
 
-      {/* Waypoint instruction text */}
-      <div className="h-28 flex items-center justify-center px-6 max-w-md">
-        {showWaypoint && displayedWaypoint && (
+      {/* Waypoint instruction text - fixed: stable key prevents flashing */}
+      <div className="h-32 flex items-center justify-center px-6 max-w-md">
+        {visible && displayedText && (
           <p
-            key={displayedWaypoint.id + "-" + Date.now()}
+            key={waypointKey}
             className="text-center text-lg leading-relaxed animate-fade-in-slow"
             style={{
               fontFamily: '"Cormorant Garamond", serif',
@@ -152,7 +173,7 @@ export function MeditationView({
               color: 'rgba(44, 42, 37, 0.6)',
             }}
           >
-            {displayedWaypoint.text}
+            {displayedText}
           </p>
         )}
       </div>

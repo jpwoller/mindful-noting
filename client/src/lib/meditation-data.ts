@@ -17,7 +17,7 @@ export interface Waypoint {
 }
 
 /** Background binaural meditation music URL (loops during session) */
-export const BINAURAL_MUSIC_URL = "/audio/binaural-loop.mp3";
+export const BINAURAL_MUSIC_URL = "/manus-storage/binaural-loop_3fd49d91.mp3";
 
 export const waypoints: Waypoint[] = [
   {

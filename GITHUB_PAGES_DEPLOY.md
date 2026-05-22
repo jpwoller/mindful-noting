@@ -2,53 +2,109 @@
 
 ## Quick Start
 
-This app is ready to deploy to GitHub Pages out of the box. All audio files are included in the repository as MP3s (~6MB total).
+This app is fully self-contained and ready for GitHub Pages. All audio files (~4.2MB) and images (CDN-hosted) work out of the box.
 
-### Automatic Deployment (GitHub Actions)
+### Step 1: Enable GitHub Pages
 
-1. Push this repository to GitHub
-2. Go to **Settings > Pages** in your repository
+1. Go to your repository: **https://github.com/jpwoller/mindful-noting**
+2. Navigate to **Settings > Pages**
 3. Under "Build and deployment", select **GitHub Actions** as the source
-4. The included `.github/workflows/deploy.yml` will automatically build and deploy on every push to `main`
 
-### Manual Deployment
+### Step 2: Add the Deployment Workflow
+
+Since GitHub doesn't allow automated tools to push workflow files, you need to add it manually:
+
+1. In your repository, click **Add file > Create new file**
+2. Name it: `.github/workflows/deploy.yml`
+3. Paste the following content:
+
+```yaml
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build
+        env:
+          VITE_BASE_PATH: /${{ github.event.repository.name }}/
+        run: pnpm run build:gh-pages
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist/public
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+```
+
+4. Click **Commit changes**
+5. The workflow will automatically run and deploy your site
+
+### Step 3: Access Your Site
+
+After the workflow completes, your site will be available at:
+**https://jpwoller.github.io/mindful-noting/**
+
+## How It Works
+
+- **Audio files**: All meditation voice clips and binaural music are in `client/public/audio/` (included in the repo)
+- **Images**: Served from a CDN (no local files needed)
+- **Base path**: The build automatically sets the correct base path (`/mindful-noting/`) via the `VITE_BASE_PATH` environment variable
+- **SPA routing**: The `404.html` handles client-side routing for GitHub Pages
+
+## Manual Build (Optional)
 
 ```bash
-# Install dependencies
 pnpm install
-
-# Build for production
-pnpm run build:gh-pages
-
-# The dist/public/ folder is your deployable static site
-# Upload it to any static hosting provider
+VITE_BASE_PATH=/mindful-noting/ pnpm run build:gh-pages
+# Output is in dist/public/
 ```
 
-## Repository Structure
+## Total Size
 
-```
-client/public/audio/     ← All meditation audio files (MP3, ~6MB total)
-  binaural-loop.mp3      ← Background binaural meditation music
-  waypoint_00_*.mp3      ← Five Hindrances intro narration
-  waypoint_01_*.mp3      ← Settling instruction
-  ...                    ← Additional waypoint instructions
-  waypoint_10_*.mp3      ← Closing instruction
-```
-
-## Base Path Configuration
-
-If deploying to a subdirectory (e.g., `https://username.github.io/mindful-noting/`), you may need to set the Vite base path. Edit `vite.config.ts` and add:
-
-```ts
-export default defineConfig({
-  base: '/mindful-noting/',  // Replace with your repo name
-  // ... rest of config
-})
-```
-
-## Notes
-
-- Images are served from a CDN and work on any hosting platform
-- Audio files are self-contained in the repository (no external dependencies)
-- The 404.html handles client-side routing for SPAs on GitHub Pages
-- Total build size is approximately 6.8MB (mostly audio files)
+- Audio files: ~4.2MB (compressed MP3)
+- Built JS/CSS: ~700KB
+- Total deploy: ~5MB
